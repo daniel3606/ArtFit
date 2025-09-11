@@ -1,3 +1,2 @@
-# CSE232lab-private
-sample repository
-making changes
+# Project ArtFit
+Social Media Platform to connect Designers and Developers

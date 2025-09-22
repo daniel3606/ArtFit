@@ -8,14 +8,16 @@ import Register from './pages/Register'
 import Skills from './pages/Skills'
 import NewProject from './pages/NewProject'
 import './index.css'
+import Profile from './pages/Profile'
 
 const router = createBrowserRouter([
-  { path: '/', element: <HomePage /> },
-  { path: '/landing', element: <Landing /> },
+  { path: '/', element: <Landing /> },
+  { path: '/home', element: <HomePage /> },
   { path: '/login', element: <Login /> },
   { path: '/register', element: <Register /> },
   { path: '/skills', element: <Skills /> },
   { path: '/projects/new', element: <NewProject /> },
+  { path: '/profile', element: <Profile /> },
 ])
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

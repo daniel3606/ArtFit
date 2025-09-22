@@ -1,15 +1,51 @@
-import { Link } from "react-router-dom"
-import { useEffect } from "react"
+import { Link, useNavigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { api, auth } from "../lib/api"
+import { isAxiosError } from "axios"
 import logo from "../assets/logo.png"
 
 export default function Login() {
+  const nav = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   useEffect(() => {
     document.title = "ArtFit Design - Login"
   }, [])
 
+  // If already logged in, go to homepage
+  useEffect(() => {
+    if (auth.access) nav('/')
+  }, [nav])
+
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    // TODO: hook up to your API
+    setError(null)
+    const fd = new FormData(e.currentTarget)
+    const username = String(fd.get("username") || "").trim()
+    const password = String(fd.get("password") || "")
+
+    if (!username || !password) return
+
+    setLoading(true)
+    api.post('/token/', { username, password })
+      .then(r => {
+        const { access, refresh } = r.data || {}
+        if (access && refresh) {
+          auth.access = access
+          auth.refresh = refresh
+          nav('/');
+        } else {
+          setError('Invalid response from server.')
+        }
+      })
+      .catch(err => {
+        if (isAxiosError(err)) {
+          setError(err.response?.data?.detail || 'Invalid username or password.')
+        } else {
+          setError('Could not log in. Please try again.')
+        }
+      })
+      .finally(() => setLoading(false))
   }
 
   return (
@@ -26,6 +62,13 @@ export default function Login() {
           <div className="rounded-2xl bg-white shadow-lg border border-gray-100 p-8">
             {/* Title */}
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Login</h2>
+
+            {/* Error */}
+            {error && (
+              <div className="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+                {error}
+              </div>
+            )}
 
             {/* Form */}
             <form onSubmit={onSubmit} className="space-y-5">
@@ -62,9 +105,10 @@ export default function Login() {
               {/* Submit */}
               <button
                 type="submit"
-                className="w-full rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300"
+                className="w-full rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-60"
+                disabled={loading}
               >
-                Login
+                {loading ? 'Logging in…' : 'Login'}
               </button>
 
               {/* Google button under login */}

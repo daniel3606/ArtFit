@@ -14,10 +14,10 @@ export default function Landing() {
       <header className="sticky top-0 z-30 bg-white/70 backdrop-blur border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-4">
           <div className="h-16 flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <Link to={auth.access ? "/home" : "/"} className="flex items-center gap-2">
               <img src={logo} alt="ArtFit Logo" className="h-9 w-9 object-contain" />
               <span className="text-xl font-extrabold tracking-tight">ArtFit</span>
-            </div>
+            </Link>
             <nav className="hidden md:flex items-center gap-8 text-sm">
               <a href="#features" className="hover:text-blue-600">Features</a>
               <a href="#how" className="hover:text-blue-600">How it works</a>
@@ -221,10 +221,10 @@ export default function Landing() {
       {/* Footer */}
       <footer className="py-10 border-t border-gray-100">
         <div className="max-w-6xl mx-auto px-4 text-sm text-gray-500 flex flex-col md:flex-row items-center md:justify-between gap-4">
-          <div className="flex items-center gap-2">
+          <Link to={auth.access ? "/home" : "/"} className="flex items-center gap-2">
             <img src={logo} alt="ArtFit Logo" className="h-5 w-5 object-contain" />
             <span>© {new Date().getFullYear()} ArtFit</span>
-          </div>
+          </Link>
           <div className="flex items-center gap-5">
             <a href="#features" className="hover:text-blue-600">Features</a>
             <a href="#how" className="hover:text-blue-600">How it works</a>

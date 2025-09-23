@@ -40,10 +40,10 @@ export default function HomePage() {
       <header className="sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4">
           <div className="h-16 flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <Link to={auth.access ? "/home" : "/"} className="flex items-center gap-2">
               <img src={logo} alt="ArtFit Logo" className="h-8 w-8 object-contain" />
               <span className="text-lg font-extrabold tracking-tight">ArtFit</span>
-            </div>
+            </Link>
             <nav className="hidden md:flex items-center gap-6 text-sm">
               <Link to="/projects/new" className="hover:text-blue-600">New project</Link>
               {auth.access ? (

@@ -64,8 +64,10 @@ export default function Register() {
     <div className="min-h-screen bg-gray-50">
       {/* Header: logo + title top-left (bigger) */}
       <header className="absolute top-4 left-4 flex items-center gap-3">
-        <img src={logo} alt="ArtFit Logo" className="w-12 h-12 object-contain" />
-        <span className="text-3xl font-extrabold text-gray-900">ArtFit</span>
+        <Link to="/" className="flex items-center gap-3">
+          <img src={logo} alt="ArtFit Logo" className="w-12 h-12 object-contain" />
+          <span className="text-3xl font-extrabold text-gray-900">ArtFit</span>
+        </Link>
       </header>
 
       {/* Centered auth card */}

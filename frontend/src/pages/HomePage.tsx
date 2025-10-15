@@ -42,7 +42,7 @@ export default function HomePage() {
       <div className="hidden lg:block fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-20">
         <div className="p-6">
           {/* Logo */}
-          <Link to={auth.access ? "/home" : "/"} className="flex items-center gap-3 mb-8">
+          <Link to={"/"} className="flex items-center gap-3 mb-8">
             <img src={logo} alt="ArtFit Logo" className="h-8 w-8 object-contain" />
             <span className="text-xl font-extrabold tracking-tight">ArtFit</span>
           </Link>

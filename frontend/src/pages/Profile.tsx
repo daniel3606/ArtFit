@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
 import { api, auth } from '../lib/api'
 import { useNavigate } from 'react-router-dom'
-import logo from '../assets/logo.png'
 
 type User = { id: number; username: string; email: string; role?: string }
 type Work = { id: number; title: string; image: string }
@@ -109,84 +107,7 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:block fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-20">
-        <div className="p-6">
-          {/* Logo */}
-          <Link to={auth.access ? "/home" : "/"} className="flex items-center gap-3 mb-8">
-            <img src={logo} alt="ArtFit Logo" className="h-8 w-8 object-contain" />
-            <span className="text-xl font-extrabold tracking-tight">ArtFit</span>
-          </Link>
-
-          {/* Navigation */}
-          <nav className="space-y-2">
-            <Link to="/home" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 group">
-              <div className="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-200">
-                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
-                </svg>
-              </div>
-              <span className="font-medium">Explore</span>
-            </Link>
-            
-            <Link to="/search" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 group">
-              <div className="w-8 h-8 rounded-lg bg-purple-100 flex items-center justify-center group-hover:bg-purple-200">
-                <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </div>
-              <span className="font-medium">Search</span>
-            </Link>
-            
-            <Link to="/projects/new" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 group">
-              <div className="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center group-hover:bg-green-200">
-                <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-              </div>
-              <span className="font-medium">Add Project</span>
-            </Link>
-            
-            <Link to="/settings" className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 group">
-              <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center group-hover:bg-gray-200">
-                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <span className="font-medium">Settings</span>
-            </Link>
-            
-            {auth.access && (
-              <Link to="/profile" className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 border border-gray-200 group">
-                <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-                  <span className="text-xs font-semibold text-gray-700">Me</span>
-                </div>
-                <span className="font-medium text-gray-700">Profile</span>
-              </Link>
-            )}
-          </nav>
-        </div>
-      </div>
-
-      {/* Mobile Header */}
-      <header className="lg:hidden sticky top-0 z-30 bg-white/80 backdrop-blur border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="h-16 flex items-center justify-between">
-            <Link to={auth.access ? "/home" : "/"} className="flex items-center gap-2">
-              <img src={logo} alt="ArtFit Logo" className="h-8 w-8 object-contain" />
-              <span className="text-lg font-extrabold tracking-tight">ArtFit</span>
-            </Link>
-            <nav className="flex items-center gap-4 text-sm">
-              <Link to="/home" className="hover:text-blue-600">Home</Link>
-              <Link to="/settings" className="hover:text-blue-600">Settings</Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      <div className="lg:ml-64">
-        <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-4xl mx-auto p-6">
         {/* Header card */}
         <div className="rounded-2xl bg-white shadow-lg border border-gray-100 p-6 flex items-start gap-5">
           <div className="shrink-0">
@@ -253,7 +174,6 @@ export default function Profile() {
               ))}
             </div>
           )}
-        </div>
         </div>
       </div>
     </div>

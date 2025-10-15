@@ -1,0 +1,11 @@
+backend/
+node_modules/
+.git/
+.DS_Store
+*.pyc
+__pycache__/
+.env
+.env.local
+docker-compose.yml
+Dockerfile
+

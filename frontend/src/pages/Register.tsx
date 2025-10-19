@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState, useRef } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
-import { api } from '../lib/api'
+import { api, auth } from '../lib/api'
 import { isAxiosError } from 'axios'
 import logo from '../assets/logo.png'
+import { renderGoogleButton } from '../lib/google-auth'
 
 type Role = 'DEV' | 'DES' | 'BOTH'
 
@@ -15,9 +16,37 @@ export default function Register() {
   const [pickDes, setPickDes] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const googleButtonRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     document.title = 'ArtFit Design - Register'
+  }, [])
+
+  // Initialize Google Sign-In button
+  useEffect(() => {
+    if (googleButtonRef.current) {
+      const timer = setTimeout(() => {
+        if (googleButtonRef.current) {
+          renderGoogleButton(
+            googleButtonRef.current,
+            (response) => {
+              // If new user, redirect to skills selection
+              // For now, redirect to homepage (could add role selection modal)
+              if (response.is_new_user) {
+                // TODO: Show role selection modal before redirecting
+                nav('/');
+              } else {
+                nav('/');
+              }
+            },
+            (error) => {
+              setError('Google login failed. Please try again.');
+            }
+          );
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
   }, [])
 
   const role: Role | null = useMemo(() => {
@@ -38,7 +67,14 @@ export default function Register() {
 
     setLoading(true)
     try {
-      await api.post('/accounts/register/', { username, email, password, role })
+      const response = await api.post('/accounts/register/', { username, email, password, role })
+      
+      // Store JWT tokens for automatic login
+      const { access, refresh } = response.data
+      if (access && refresh) {
+        auth.access = access
+        auth.refresh = refresh
+      }
 
       // ✅ redirect based on picked role(s)
       if (role === 'DEV') nav('/developerskills')
@@ -46,18 +82,17 @@ export default function Register() {
       else nav('/both') // shows Developer then Designer in sequence
     } catch (err: unknown) {
       if (isAxiosError(err)) {
-        setError(err.response?.data?.detail ?? 'Could not register. Try a different username/email.')
+        const errorMessage = err.response?.data?.username?.[0] 
+          || err.response?.data?.email?.[0]
+          || err.response?.data?.detail 
+          || 'Could not register. Try a different username/email.'
+        setError(errorMessage)
       } else {
         setError('Unexpected error. Please try again.')
       }
     } finally {
       setLoading(false)
     }
-  }
-
-  function onGoogleClick() {
-    // TODO: wire to your backend OAuth start URL (example below):
-    // window.location.href = 'http://localhost:8000/api/accounts/oauth/google/start/'
   }
 
   return (
@@ -180,17 +215,7 @@ export default function Register() {
               </button>
 
               {/* Google under submit */}
-              <button
-                type="button"
-                onClick={onGoogleClick}
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-blue-100"
-              >
-                {/* Minimal Google “G” placeholder; swap for the official SVG if you like */}
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white border border-gray-300 text-xs">
-                  G
-                </span>
-                Continue with Google
-              </button>
+              <div ref={googleButtonRef} className="w-full"></div>
             </form>
 
             {/* Link */}

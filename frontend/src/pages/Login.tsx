@@ -1,13 +1,16 @@
 import { Link, useNavigate } from "react-router-dom"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { api, auth } from "../lib/api"
 import { isAxiosError } from "axios"
 import logo from "../assets/logo.png"
+import { renderGoogleButton } from "../lib/google-auth"
 
 export default function Login() {
   const nav = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const googleButtonRef = useRef<HTMLDivElement>(null)
+  
   useEffect(() => {
     document.title = "ArtFit Design - Login"
   }, [])
@@ -16,6 +19,28 @@ export default function Login() {
   useEffect(() => {
     if (auth.access) nav('/')
   }, [nav])
+
+  // Initialize Google Sign-In button
+  useEffect(() => {
+    if (googleButtonRef.current) {
+      // Small delay to ensure Google library is loaded
+      const timer = setTimeout(() => {
+        if (googleButtonRef.current) {
+          renderGoogleButton(
+            googleButtonRef.current,
+            (response) => {
+              // Successfully logged in with Google
+              nav('/');
+            },
+            (error) => {
+              setError('Google login failed. Please try again.');
+            }
+          );
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [])
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -114,15 +139,7 @@ export default function Login() {
               </button>
 
               {/* Google button under login */}
-              <button
-                type="button"
-                className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-800 hover:bg-gray-50 focus:outline-none focus:ring-4 focus:ring-blue-100"
-              >
-                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-white border border-gray-300 text-xs">
-                  G
-                </span>
-                Continue with Google
-              </button>
+              <div ref={googleButtonRef} className="w-full"></div>
             </form>
 
             {/* Links */}

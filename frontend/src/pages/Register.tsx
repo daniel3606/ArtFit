@@ -39,7 +39,7 @@ export default function Register() {
                 nav('/');
               }
             },
-            (error) => {
+            () => {
               setError('Google login failed. Please try again.');
             }
           );
@@ -47,7 +47,7 @@ export default function Register() {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [])
+  }, [nav])
 
   const role: Role | null = useMemo(() => {
     if (pickDev && pickDes) return 'BOTH'

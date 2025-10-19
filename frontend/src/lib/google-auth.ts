@@ -26,7 +26,7 @@ export interface GoogleAuthResponse {
 export async function handleGoogleLogin(credential: string): Promise<GoogleAuthResponse> {
   const response = await api.post('/accounts/google-auth/', { token: credential });
   
-  const { access, refresh, user, is_new_user } = response.data;
+  const { access, refresh } = response.data;
   
   // Store tokens
   if (access && refresh) {
@@ -49,9 +49,9 @@ export function initGoogleOneTap(onSuccess: (response: GoogleAuthResponse) => vo
       try {
         const result = await handleGoogleLogin(response.credential);
         onSuccess(result);
-      } catch (error) {
-        console.error('Google login failed:', error);
-        if (onError) onError(error);
+      } catch (err) {
+        console.error('Google login failed:', err);
+        if (onError) onError(err);
       }
     },
   });
@@ -73,9 +73,9 @@ export function renderGoogleButton(
       try {
         const result = await handleGoogleLogin(response.credential);
         onSuccess(result);
-      } catch (error) {
-        console.error('Google login failed:', error);
-        if (onError) onError(error);
+      } catch (err) {
+        console.error('Google login failed:', err);
+        if (onError) onError(err);
       }
     },
   });

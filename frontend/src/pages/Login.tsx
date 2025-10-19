@@ -28,11 +28,11 @@ export default function Login() {
         if (googleButtonRef.current) {
           renderGoogleButton(
             googleButtonRef.current,
-            (response) => {
+            () => {
               // Successfully logged in with Google
               nav('/');
             },
-            (error) => {
+            () => {
               setError('Google login failed. Please try again.');
             }
           );
@@ -40,7 +40,7 @@ export default function Login() {
       }, 500);
       return () => clearTimeout(timer);
     }
-  }, [])
+  }, [nav])
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

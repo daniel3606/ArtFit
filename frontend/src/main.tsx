@@ -10,6 +10,11 @@ import './index.css'
 import Profile from './pages/Profile'
 import Search from './pages/Search'
 import Settings from './pages/Settings'
+import DeveloperSkills from './pages/DeveloperSkills'
+import DesignSkills from './pages/DesignSkills'
+import BothFlow from './pages/BothFlow'
+import Nickname from './pages/Nickname'
+import Tags from './pages/Tags'
 
 const router = createBrowserRouter([
   { path: '/', element: <Landing /> },
@@ -17,6 +22,11 @@ const router = createBrowserRouter([
   { path: '/login', element: <Login /> },
   { path: '/register', element: <Register /> },
   { path: '/skills', element: <Skills /> },
+  { path: '/developerskills', element: <DeveloperSkills /> },
+  { path: '/designskills', element: <DesignSkills /> },
+  { path: '/both', element: <BothFlow /> },
+  { path: '/nickname', element: <Nickname /> },
+  { path: '/tags', element: <Tags /> },
   { path: '/projects/new', element: <NewProject /> },
   { path: '/profile', element: <Profile /> },
   { path: '/search', element: <Search /> },

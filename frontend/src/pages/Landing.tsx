@@ -1,191 +1,331 @@
 import { Link, useNavigate } from "react-router-dom"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { auth } from "../lib/api"
+import { motion, AnimatePresence } from "framer-motion"
+import { Menu, X, Zap, Users, MessageSquare, ChevronDown, Github, Twitter, Linkedin, Code2 } from "lucide-react"
+import { cn } from "@/lib/utils"
 import logo from "../assets/logo.png"
+
+function BGPattern({
+  variant = "dots",
+  size = 32,
+  fill = "rgba(148, 163, 184, 0.1)",
+}: {
+  variant?: "dots" | "grid"
+  size?: number
+  fill?: string
+}) {
+  const bgImage =
+    variant === "dots"
+      ? `radial-gradient(${fill} 1px, transparent 1px)`
+      : `linear-gradient(to right, ${fill} 1px, transparent 1px), linear-gradient(to bottom, ${fill} 1px, transparent 1px)`
+
+  return (
+    <div
+      className="absolute inset-0 z-0 size-full [mask-image:radial-gradient(ellipse_at_center,var(--background),transparent)]"
+      style={{ backgroundImage: bgImage, backgroundSize: `${size}px ${size}px` }}
+    />
+  )
+}
 
 export default function Landing() {
   const nav = useNavigate()
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const [openFaq, setOpenFaq] = useState<number | null>(null)
+
   useEffect(() => {
-    if (auth.access) nav('/home')
+    if (auth.access) nav("/home")
   }, [nav])
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  const features = [
+    {
+      icon: Code2,
+      title: "For Developers",
+      description: "Find talented designers to bring your projects to life with stunning visuals and user experiences.",
+    },
+    {
+      icon: Zap,
+      title: "For Designers",
+      description: "Connect with developers who need your creative expertise to build amazing products.",
+    },
+    {
+      icon: Users,
+      title: "Seamless Collaboration",
+      description: "Built-in tools for communication, file sharing, and project management in one place.",
+    },
+    {
+      icon: MessageSquare,
+      title: "Real-time Chat",
+      description: "Instant messaging and video calls to keep your team connected and productive.",
+    },
+  ]
+
+  const steps = [
+    { number: "01", title: "Create Profile", description: "Sign up and showcase your skills and portfolio" },
+    { number: "02", title: "Browse Matches", description: "Find the perfect developer or designer for your needs" },
+    { number: "03", title: "Start Collaborating", description: "Connect and build amazing projects together" },
+  ]
+
+  const faqs = [
+    {
+      question: "How does ArtFit match developers with designers?",
+      answer:
+        "Our algorithm analyzes skills, experience, project requirements, and working styles to suggest the best matches for successful collaboration.",
+    },
+    {
+      question: "Is ArtFit free to use?",
+      answer:
+        "Yes! ArtFit offers a free tier with essential features. Premium plans unlock advanced collaboration tools, priority matching, and unlimited projects.",
+    },
+    {
+      question: "How do I ensure quality collaborations?",
+      answer:
+        "We verify all users, provide detailed portfolios and reviews, and offer secure payment protection for paid projects.",
+    },
+    {
+      question: "Can I work on multiple projects simultaneously?",
+      answer:
+        "Absolutely! There are no limits on the number of collaborations you can have. Manage all your projects from one dashboard.",
+    },
+  ]
+
   return (
-    <div className="min-h-screen bg-white text-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+      <BGPattern />
+
       {/* Navbar */}
-      <header className="sticky top-0 z-30 bg-white/70 backdrop-blur border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="h-16 flex items-center justify-between">
-            <Link to={auth.access ? "/home" : "/"} className="flex items-center gap-2">
-              <img src={logo} alt="ArtFit Logo" className="h-9 w-9 object-contain" />
-              <span className="text-xl font-extrabold tracking-tight">ArtFit</span>
-            </Link>
-            <nav className="hidden md:flex items-center gap-8 text-sm">
-              <a href="#features" className="hover:text-blue-600">Features</a>
-              <a href="#how" className="hover:text-blue-600">How it works</a>
-              <a href="#faq" className="hover:text-blue-600">FAQ</a>
-            </nav>
-            <div className="flex items-center gap-3">
-              <Link
-                to="/login"
-                className="text-sm px-4 py-2 rounded-lg border border-gray-300 hover:bg-gray-50"
-              >
-                Log in
+      <motion.nav
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        className={cn(
+          "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+          scrolled
+            ? "bg-slate-950/80 backdrop-blur-xl border-b border-white/10 shadow-lg"
+            : "bg-transparent"
+        )}
+      >
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center space-x-2">
+              <img src={logo} alt="ArtFit" className="h-9 w-9 object-contain" />
+              <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                ArtFit
+              </span>
+            </motion.div>
+
+            <div className="hidden md:flex items-center space-x-8">
+              {["Features", "How it Works", "FAQ"].map((item, i) => (
+                <motion.a
+                  key={item}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.1 }}
+                  href={`#${item.toLowerCase().replace(/ /g, "-")}`}
+                  className="text-sm text-slate-300 hover:text-white transition-colors"
+                >
+                  {item}
+                </motion.a>
+              ))}
+            </div>
+
+            <div className="hidden md:flex items-center space-x-4">
+              <Link to="/login" className="px-4 py-2 text-sm text-slate-300 hover:text-white transition-colors">
+                Sign In
               </Link>
               <Link
                 to="/register"
-                className="text-sm px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 shadow"
+                className="px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-sm font-semibold hover:shadow-lg hover:shadow-purple-500/50 transition-all"
               >
-                Get started
+                Get Started
               </Link>
             </div>
+
+            <button className="md:hidden text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+              {mobileMenuOpen ? <X /> : <Menu />}
+            </button>
           </div>
         </div>
-      </header>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="py-20 md:py-28 grid md:grid-cols-2 gap-10 items-center">
-            <div>
-              <h1 className="text-4xl md:text-5xl font-extrabold leading-tight">
-                Match <span className="text-blue-600">Developers</span> &{" "}
-                <span className="text-blue-600">Designers</span> to build faster.
-              </h1>
-              <p className="mt-4 text-gray-600 text-lg">
-                ArtFit connects creators by skills, style, and goals. Assemble the perfect duo for your next app,
-                product, or brand—without the endless DMs.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-slate-900/95 backdrop-blur-xl border-t border-white/10"
+            >
+              <div className="px-6 py-4 space-y-4">
+                {["Features", "How it Works", "FAQ"].map((item) => (
+                  <a
+                    key={item}
+                    href={`#${item.toLowerCase().replace(/ /g, "-")}`}
+                    className="block text-slate-300 hover:text-white transition-colors"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item}
+                  </a>
+                ))}
                 <Link
                   to="/register"
-                  className="px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow"
+                  className="block w-full text-center px-6 py-2 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full text-sm font-semibold"
                 >
-                  Create your free account
+                  Get Started
                 </Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.nav>
+
+      {/* Hero */}
+      <section className="relative pt-32 pb-20 px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-purple-500/10 via-transparent to-transparent" />
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-center max-w-4xl mx-auto"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.2 }}
+              className="inline-flex items-center space-x-2 px-4 py-2 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full mb-8"
+            >
+              <Zap className="w-4 h-4 text-purple-400" />
+              <span className="text-sm text-slate-300">Connecting Creativity with Code</span>
+            </motion.div>
+
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
+              <span className="bg-gradient-to-r from-white via-purple-200 to-pink-200 bg-clip-text text-transparent">
+                Where Developers
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400 bg-clip-text text-transparent">
+                Meet Designers
+              </span>
+            </h1>
+
+            <p className="text-xl text-slate-400 mb-10 max-w-2xl mx-auto">
+              ArtFit bridges the gap between technical excellence and creative brilliance. Build amazing products together.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Link
+                  to="/register"
+                  className="group inline-block px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full font-semibold text-lg shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/60 transition-all relative overflow-hidden"
+                >
+                  <span className="relative z-10">Start Collaborating</span>
+                </Link>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
                   to="/login"
-                  className="px-6 py-3 rounded-xl border border-gray-300 font-semibold hover:bg-gray-50"
+                  className="inline-block px-8 py-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full font-semibold text-lg hover:bg-white/10 transition-all"
                 >
-                  Log in
+                  Sign In
                 </Link>
-              </div>
-
-              {/* Trust row */}
-              <div className="mt-8 flex items-center gap-6 text-sm text-gray-500">
-                <div className="flex items-center gap-2">
-                  <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
-                  Real-time matching
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
-                  Curated skill tags
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="inline-block h-2 w-2 rounded-full bg-purple-500" />
-                  Portfolio-first
-                </div>
-              </div>
+              </motion.div>
             </div>
-
-            {/* Mock preview card */}
-            <div className="relative">
-              <div className="absolute -top-10 -right-10 h-56 w-56 bg-blue-100 rounded-full blur-3xl opacity-60 pointer-events-none" />
-              <div className="absolute -bottom-8 -left-14 h-56 w-56 bg-indigo-100 rounded-full blur-3xl opacity-60 pointer-events-none" />
-
-              <div className="relative rounded-2xl border border-gray-200 shadow-lg overflow-hidden bg-white">
-                <div className="p-5 border-b border-gray-100 flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-red-400" />
-                  <div className="h-3 w-3 rounded-full bg-yellow-400" />
-                  <div className="h-3 w-3 rounded-full bg-green-400" />
-                  <span className="ml-3 text-sm text-gray-500">ArtFit · Project Match</span>
-                </div>
-                <div className="p-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="rounded-xl border border-gray-200 p-4">
-                      <div className="text-xs text-gray-500">Developer</div>
-                      <div className="mt-1 font-semibold">TypeScript · React · Django</div>
-                      <div className="mt-3 text-sm text-gray-600">
-                        Seeking a designer for a wellness app MVP.
-                      </div>
-                    </div>
-                    <div className="rounded-xl border border-gray-200 p-4">
-                      <div className="text-xs text-gray-500">Designer</div>
-                      <div className="mt-1 font-semibold">UI/UX · Design Systems · Figma</div>
-                      <div className="mt-3 text-sm text-gray-600">
-                        Looking for a dev to build a clean, accessible UI kit.
-                      </div>
-                    </div>
-                    <div className="rounded-xl border border-gray-200 p-4 sm:col-span-2">
-                      <div className="text-xs text-gray-500">Smart match</div>
-                      <div className="mt-2 h-2 w-full rounded bg-gray-100 overflow-hidden">
-                        <div className="h-2 bg-blue-600 w-2/3" />
-                      </div>
-                      <div className="mt-2 text-xs text-gray-500">67% fit · based on skills & tags</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <p className="text-xs text-gray-400 mt-3 text-center">
-                Preview UI. Replace with your screenshots later.
-              </p>
-            </div>
-          </div>
+          </motion.div>
         </div>
+
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
       </section>
 
       {/* Features */}
-      <section id="features" className="py-16 bg-gray-50 border-y border-gray-100">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-8">Why teams start on ArtFit</h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              {
-                title: "Skill-driven matching",
-                desc: "Select languages, tools, and styles to find collaborators who fit your stack and aesthetic.",
-              },
-              {
-                title: "Portfolio-first profiles",
-                desc: "Showcase your best work and see others’ at a glance—no cold outreach guessing.",
-              },
-              {
-                title: "Frictionless start",
-                desc: "Kick off a project with clear roles, tags, and expectations right from the first chat.",
-              },
-            ].map((f) => (
-              <div key={f.title} className="rounded-xl bg-white p-6 border border-gray-100 shadow-sm">
-                <div className="h-10 w-10 rounded-lg bg-blue-600/10 flex items-center justify-center mb-3">
-                  <div className="h-2 w-2 rounded-full bg-blue-600" />
+      <section id="features" className="py-20 px-6 relative">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+              Why Choose ArtFit?
+            </h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">
+              Everything you need to find your perfect creative partner and build exceptional projects
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {features.map((feature, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ y: -5 }}
+                className="group relative p-6 bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl hover:bg-white/10 transition-all"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity" />
+                <div className="relative z-10">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <feature.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
+                  <p className="text-slate-400">{feature.description}</p>
                 </div>
-                <h3 className="font-semibold">{f.title}</h3>
-                <p className="text-gray-600 text-sm mt-2">{f.desc}</p>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* How it works */}
-      <section id="how" className="py-16">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-8">How it works</h2>
-          <ol className="grid md:grid-cols-3 gap-6 text-sm">
-            {[
-              { step: "1", title: "Create your profile", desc: "Pick developer/designer (or both) and select tags." },
-              { step: "2", title: "Get matched", desc: "Our engine surfaces high-fit collaborators and projects." },
-              { step: "3", title: "Build together", desc: "Start fast with shared context and organized project spaces." },
-            ].map((s) => (
-              <li key={s.step} className="rounded-xl bg-white p-6 border border-gray-100 shadow-sm">
-                <div className="text-xs text-gray-500">Step {s.step}</div>
-                <div className="mt-1 font-semibold">{s.title}</div>
-                <p className="mt-2 text-gray-600">{s.desc}</p>
-              </li>
-            ))}
-          </ol>
+      {/* How It Works */}
+      <section id="how-it-works" className="py-20 px-6 relative">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+              How It Works
+            </h2>
+            <p className="text-slate-400 text-lg max-w-2xl mx-auto">Get started in three simple steps</p>
+          </motion.div>
 
-          <div className="mt-10">
+          <div className="grid md:grid-cols-3 gap-8">
+            {steps.map((step, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -30 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.2 }}
+                className="relative text-center"
+              >
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-full text-2xl font-bold mb-4">
+                  {step.number}
+                </div>
+                <h3 className="text-2xl font-semibold mb-2">{step.title}</h3>
+                <p className="text-slate-400">{step.description}</p>
+                {index < steps.length - 1 && (
+                  <div className="hidden md:block absolute top-8 left-[60%] w-[80%] h-0.5 bg-gradient-to-r from-purple-500/50 to-transparent" />
+                )}
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="mt-12 text-center">
             <Link
               to="/register"
-              className="px-6 py-3 rounded-xl bg-blue-600 text-white font-semibold hover:bg-blue-700 shadow"
+              className="inline-block px-8 py-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full font-semibold text-lg shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-purple-500/60 transition-all"
             >
               Start for free
             </Link>
@@ -194,42 +334,103 @@ export default function Landing() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="py-16 bg-gray-50 border-t border-gray-100">
-        <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-extrabold mb-8">Common questions</h2>
-          <div className="grid md:grid-cols-2 gap-6 text-sm">
-            <div className="rounded-xl bg-white p-6 border border-gray-100 shadow-sm">
-              <h3 className="font-semibold">Is ArtFit free?</h3>
-              <p className="text-gray-600 mt-2">Yes—get started free. We’ll add paid pro features later.</p>
-            </div>
-            <div className="rounded-xl bg-white p-6 border border-gray-100 shadow-sm">
-              <h3 className="font-semibold">How do matches work?</h3>
-              <p className="text-gray-600 mt-2">We blend your role, skills, and style tags to recommend collaborators.</p>
-            </div>
-            <div className="rounded-xl bg-white p-6 border border-gray-100 shadow-sm">
-              <h3 className="font-semibold">Can I be both dev and designer?</h3>
-              <p className="text-gray-600 mt-2">Absolutely. Pick BOTH and you’ll step through both skill screens.</p>
-            </div>
-            <div className="rounded-xl bg-white p-6 border border-gray-100 shadow-sm">
-              <h3 className="font-semibold">Can teams use ArtFit?</h3>
-              <p className="text-gray-600 mt-2">Yes—form ad-hoc teams and invite collaborators to shared spaces.</p>
-            </div>
+      <section id="faq" className="py-20 px-6 relative">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center mb-16"
+          >
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+              Frequently Asked Questions
+            </h2>
+          </motion.div>
+
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden"
+              >
+                <button
+                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                  className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-white/5 transition-colors"
+                >
+                  <span className="font-semibold">{faq.question}</span>
+                  <ChevronDown className={cn("w-5 h-5 transition-transform", openFaq === index && "rotate-180")} />
+                </button>
+                <AnimatePresence>
+                  {openFaq === index && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-6 pb-4 text-slate-400">{faq.answer}</div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-10 border-t border-gray-100">
-        <div className="max-w-6xl mx-auto px-4 text-sm text-gray-500 flex flex-col md:flex-row items-center md:justify-between gap-4">
-          <Link to={auth.access ? "/home" : "/"} className="flex items-center gap-2">
-            <img src={logo} alt="ArtFit Logo" className="h-5 w-5 object-contain" />
-            <span>© {new Date().getFullYear()} ArtFit</span>
-          </Link>
-          <div className="flex items-center gap-5">
-            <a href="#features" className="hover:text-blue-600">Features</a>
-            <a href="#how" className="hover:text-blue-600">How it works</a>
-            <a href="#faq" className="hover:text-blue-600">FAQ</a>
-            <Link to="/login" className="hover:text-blue-600">Log in</Link>
+      <footer className="py-12 px-6 border-t border-white/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <img src={logo} alt="ArtFit" className="h-8 w-8 object-contain" />
+                <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                  ArtFit
+                </span>
+              </div>
+              <p className="text-slate-400 text-sm">Connecting developers with designers to create amazing products.</p>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-4">Product</h4>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li><a href="#features" className="hover:text-white transition-colors">Features</a></li>
+                <li><a href="#how-it-works" className="hover:text-white transition-colors">How it Works</a></li>
+                <li><a href="#faq" className="hover:text-white transition-colors">FAQ</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-4">Get Started</h4>
+              <ul className="space-y-2 text-slate-400 text-sm">
+                <li><Link to="/register" className="hover:text-white transition-colors">Sign Up</Link></li>
+                <li><Link to="/login" className="hover:text-white transition-colors">Log In</Link></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-4">Connect</h4>
+              <div className="flex space-x-4">
+                <a href="#" className="w-10 h-10 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <Twitter className="w-5 h-5" />
+                </a>
+                <a href="#" className="w-10 h-10 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <Github className="w-5 h-5" />
+                </a>
+                <a href="#" className="w-10 h-10 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full flex items-center justify-center hover:bg-white/10 transition-colors">
+                  <Linkedin className="w-5 h-5" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-8 border-t border-white/10 text-center text-slate-400 text-sm">
+            <p>&copy; {new Date().getFullYear()} ArtFit. All rights reserved.</p>
           </div>
         </div>
       </footer>

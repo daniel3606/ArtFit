@@ -2,158 +2,242 @@ import { Link, useNavigate } from "react-router-dom"
 import { useEffect, useState, useRef } from "react"
 import { api, auth } from "../lib/api"
 import { isAxiosError } from "axios"
-import logo from "../assets/logo.png"
 import { renderGoogleButton } from "../lib/google-auth"
+import { motion } from "framer-motion"
+import { Eye, EyeOff, User, Lock } from "lucide-react"
+import logo from "../assets/logo.png"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+
+function BGPattern() {
+  return (
+    <div
+      className="absolute inset-0 z-0 size-full [mask-image:radial-gradient(ellipse_at_center,var(--background),transparent)]"
+      style={{
+        backgroundImage: "radial-gradient(rgba(139, 92, 246, 0.1) 1px, transparent 1px)",
+        backgroundSize: "32px 32px",
+      }}
+    />
+  )
+}
 
 export default function Login() {
   const nav = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
   const googleButtonRef = useRef<HTMLDivElement>(null)
-  
+
   useEffect(() => {
-    document.title = "ArtFit Design - Login"
+    document.title = "ArtFit - Sign In"
   }, [])
 
-  // If already logged in, go to homepage
   useEffect(() => {
-    if (auth.access) nav('/')
+    if (auth.access) nav("/")
   }, [nav])
 
-  // Initialize Google Sign-In button
   useEffect(() => {
     if (googleButtonRef.current) {
-      // Small delay to ensure Google library is loaded
       const timer = setTimeout(() => {
         if (googleButtonRef.current) {
           renderGoogleButton(
             googleButtonRef.current,
-            () => {
-              // Successfully logged in with Google
-              nav('/');
-            },
-            () => {
-              setError('Google login failed. Please try again.');
-            }
-          );
+            () => nav("/"),
+            () => setError("Google login failed. Please try again.")
+          )
         }
-      }, 500);
-      return () => clearTimeout(timer);
+      }, 500)
+      return () => clearTimeout(timer)
     }
   }, [nav])
 
   function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setError(null)
-    const fd = new FormData(e.currentTarget)
-    const username = String(fd.get("username") || "").trim()
-    const password = String(fd.get("password") || "")
-
-    if (!username || !password) return
+    if (!username.trim() || !password) return
 
     setLoading(true)
-    api.post('/token/', { username, password })
-      .then(r => {
+    api
+      .post("/token/", { username: username.trim(), password })
+      .then((r) => {
         const { access, refresh } = r.data || {}
         if (access && refresh) {
           auth.access = access
           auth.refresh = refresh
-          nav('/');
+          nav("/home")
         } else {
-          setError('Invalid response from server.')
+          setError("Invalid response from server.")
         }
       })
-      .catch(err => {
+      .catch((err) => {
         if (isAxiosError(err)) {
-          setError(err.response?.data?.detail || 'Invalid username or password.')
+          setError(err.response?.data?.detail || "Invalid username or password.")
         } else {
-          setError('Could not log in. Please try again.')
+          setError("Could not log in. Please try again.")
         }
       })
       .finally(() => setLoading(false))
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header: logo + title top-left */}
-      <header className="absolute top-4 left-4 flex items-center gap-3">
-        <Link to="/" className="flex items-center gap-3">
-          <img src={logo} alt="ArtFit Logo" className="w-12 h-12 object-contain" />
-          <span className="text-3xl font-extrabold text-gray-900">ArtFit</span>
-        </Link>
-      </header>
+    <div className="relative min-h-screen w-full bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900 flex items-center justify-center p-4 overflow-hidden">
+      <BGPattern />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(139,92,246,0.15),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_right,rgba(236,72,153,0.15),transparent_50%)]" />
 
-      {/* Centered auth card */}
-      <main className="flex items-center justify-center min-h-screen">
-        <div className="max-w-md w-full px-4">
-          <div className="rounded-2xl bg-white shadow-lg border border-gray-100 p-8">
-            {/* Title */}
-            <h2 className="text-3xl font-bold text-gray-900 mb-6">Login</h2>
+      {/* Logo top-left */}
+      <Link to="/" className="absolute top-6 left-6 z-10 flex items-center space-x-2">
+        <img src={logo} alt="ArtFit" className="h-10 w-10 object-contain" />
+        <span className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+          ArtFit
+        </span>
+      </Link>
 
-            {/* Error */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="relative w-full max-w-md z-10"
+      >
+        <div className="relative backdrop-blur-xl bg-white/5 border-2 border-white/10 rounded-3xl p-8 shadow-2xl">
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/10 via-transparent to-pink-500/10 pointer-events-none" />
+
+          <div className="relative z-10">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-center mb-8"
+            >
+              <h1 className="text-4xl font-bold text-white mb-2 bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                Welcome Back
+              </h1>
+              <p className="text-slate-300 text-sm">Sign in to continue your journey</p>
+            </motion.div>
+
             {error && (
-              <div className="mb-4 rounded border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+              >
                 {error}
-              </div>
+              </motion.div>
             )}
 
-            {/* Form */}
-            <form onSubmit={onSubmit} className="space-y-5">
-              {/* Username */}
-              <div>
-                <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-1">
-                  Username
-                </label>
-                <input
-                  id="username"
-                  name="username"
-                  type="text"
-                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
-                  placeholder="Enter your username"
-                  required
-                />
-              </div>
-
-              {/* Password */}
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  className="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"
-                  placeholder="Enter your password"
-                  required
-                />
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                className="w-full rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:opacity-60"
-                disabled={loading}
+            <form onSubmit={onSubmit} className="space-y-6">
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="space-y-2"
               >
-                {loading ? 'Logging in…' : 'Login'}
-              </button>
+                <Label htmlFor="username" className="text-slate-200 text-sm font-medium">
+                  Username
+                </Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                  <Input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Enter your username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    required
+                    className="pl-10 h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 rounded-xl transition-all"
+                  />
+                </div>
+              </motion.div>
 
-              {/* Google button under login */}
-              <div ref={googleButtonRef} className="w-full"></div>
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="space-y-2"
+              >
+                <Label htmlFor="password" className="text-slate-200 text-sm font-medium">
+                  Password
+                </Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+                  <Input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    className="pl-10 pr-12 h-12 bg-white/5 border-white/10 text-white placeholder:text-slate-500 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 rounded-xl transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ x: -20, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+                className="flex items-center justify-end text-sm"
+              >
+                <Link to="/forgot-password" className="text-slate-300 hover:text-purple-400 transition-colors">
+                  Forgot password?
+                </Link>
+              </motion.div>
+
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6, duration: 0.5 }}>
+                <Button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/25 transition-all duration-300 hover:shadow-purple-500/40 hover:scale-[1.02] disabled:opacity-60 disabled:hover:scale-100"
+                >
+                  {loading ? "Signing in..." : "Sign In"}
+                </Button>
+              </motion.div>
+
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.7, duration: 0.5 }}
+                className="relative"
+              >
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-white/10" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-transparent px-2 text-slate-400">Or continue with</span>
+                </div>
+              </motion.div>
+
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.8, duration: 0.5 }}>
+                <div ref={googleButtonRef} className="w-full" />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.9, duration: 0.5 }}
+                className="text-center text-sm text-slate-300"
+              >
+                Don&apos;t have an account?{" "}
+                <Link to="/register" className="text-purple-400 hover:text-purple-300 font-semibold transition-colors">
+                  Register
+                </Link>
+              </motion.div>
             </form>
-
-            {/* Links */}
-            <div className="mt-6 flex justify-between text-sm text-gray-700">
-              <Link to="/register" className="hover:text-blue-600">
-                Register
-              </Link>
-              <Link to="/forgot-password" className="hover:text-blue-600">
-                Forgot Password?
-              </Link>
-            </div>
           </div>
         </div>
-      </main>
+      </motion.div>
     </div>
   )
 }

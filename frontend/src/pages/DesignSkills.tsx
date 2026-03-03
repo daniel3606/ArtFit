@@ -1,112 +1,64 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import logo from "../assets/logo.png";
+import { useState } from "react"
+import { Link } from "react-router-dom"
+import { motion } from "framer-motion"
+import { cn } from "@/lib/utils"
+import logo from "../assets/logo.png"
 
 const categories = [
-  {
-    title: "Roles / Disciplines",
-    tags: [
-      "UI Designer", "UX Designer", "Graphic Designer", "Product Designer",
-      "Web Designer", "Motion Designer", "Game Designer", "Industrial Designer",
-      "Interior Designer", "Fashion Designer", "Brand / Identity Designer",
-      "Illustrator", "Creative Director", "Visual Designer",
-    ],
-  },
-  {
-    title: "Styles / Aesthetics",
-    tags: [
-      "Minimalist", "Modern", "Futuristic", "Flat Design", "Skeuomorphic",
-      "Corporate / Professional", "Playful / Whimsical", "Hand-Drawn / Sketch",
-      "Geometric", "Abstract", "Realistic", "Vintage / Retro", "Experimental",
-    ],
-  },
-  {
-    title: "Tools / Software",
-    tags: [
-      "Figma", "Adobe Photoshop", "Adobe Illustrator", "Adobe XD",
-      "Adobe After Effects", "Sketch", "InVision", "Blender", "Cinema4D",
-      "Procreate", "CorelDRAW", "Canva", "AutoCAD / Rhino / SolidWorks",
-    ],
-  },
-  {
-    title: "Mediums / Outputs",
-    tags: [
-      "Mobile Apps", "Websites", "Branding / Logo", "Print / Posters", "Packaging",
-      "Motion Graphics", "3D Models", "Concept Art", "Illustration", "Typography",
-      "Architecture / Interior", "Fashion Apparel", "Product Mockups",
-    ],
-  },
-  {
-    title: "Interests / Focus Areas",
-    tags: [
-      "Accessibility", "AR / VR", "AI-assisted Design", "Design Systems", "Gaming UI",
-      "E-commerce", "SaaS Platforms", "Social Media Content", "Storyboarding",
-      "Data Visualization", "Environmental / Sustainable Design",
-    ],
-  },
-];
+  { title: "Roles / Disciplines", tags: ["UI Designer", "UX Designer", "Graphic Designer", "Product Designer", "Web Designer", "Motion Designer", "Game Designer", "Illustrator", "Creative Director", "Visual Designer"] },
+  { title: "Styles / Aesthetics", tags: ["Minimalist", "Modern", "Futuristic", "Flat Design", "Skeuomorphic", "Corporate", "Playful", "Hand-Drawn", "Geometric", "Abstract", "Vintage / Retro", "Experimental"] },
+  { title: "Tools / Software", tags: ["Figma", "Adobe Photoshop", "Adobe Illustrator", "Adobe XD", "After Effects", "Sketch", "InVision", "Blender", "Cinema4D", "Procreate", "Canva"] },
+  { title: "Mediums / Outputs", tags: ["Mobile Apps", "Websites", "Branding / Logo", "Print / Posters", "Packaging", "Motion Graphics", "3D Models", "Concept Art", "Illustration", "Typography"] },
+  { title: "Interests / Focus Areas", tags: ["Accessibility", "AR / VR", "AI-assisted Design", "Design Systems", "Gaming UI", "E-commerce", "SaaS Platforms", "Data Visualization"] },
+]
 
-const DesignSkills: React.FC = () => {
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+export default function DesignSkills() {
+  const [selectedTags, setSelectedTags] = useState<string[]>([])
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags((prev) =>
-      prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]
-    );
-  };
+  function toggleTag(tag: string) {
+    setSelectedTags((prev) => prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag])
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col px-6 py-8">
-      {/* Top-left logo */}
-      <div className="flex items-center space-x-2 mb-8">
-        <img src={logo} alt="ArtFit Logo" className="w-12 h-12 object-contain" />
-        <span className="text-2xl font-bold text-gray-900">ArtFit</span>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white flex flex-col px-6 py-8">
+      <Link to="/" className="flex items-center space-x-2 mb-8">
+        <img src={logo} alt="ArtFit" className="w-10 h-10 object-contain" />
+        <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">ArtFit</span>
+      </Link>
 
-      {/* Main */}
       <div className="flex flex-col items-center flex-1">
-        <h2 className="text-3xl font-bold text-gray-900 mb-10">Select Your Design Skills</h2>
+        <motion.h2 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-3xl font-bold mb-10 bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">
+          Select Your Design Skills
+        </motion.h2>
 
-        <div className="w-full max-w-4xl space-y-10">
-          {categories.map((category) => (
-            <div key={category.title} className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">{category.title}</h3>
+        <div className="w-full max-w-4xl space-y-8">
+          {categories.map((category, ci) => (
+            <motion.div key={category.title} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: ci * 0.05 }}
+              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-slate-200 mb-4">{category.title}</h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {category.tags.map((tag) => {
-                  const active = selectedTags.includes(tag);
+                  const active = selectedTags.includes(tag)
                   return (
-                    <button
-                      key={tag}
-                      type="button"
-                      aria-pressed={active}
-                      onClick={() => toggleTag(tag)}
-                      className={`px-4 py-2 text-sm rounded-lg border font-medium transition ${
-                        active
-                          ? "bg-blue-600 text-white border-blue-600 shadow"
-                          : "bg-white text-gray-800 border-gray-300 hover:bg-gray-50"
-                      }`}
-                    >
+                    <button key={tag} type="button" aria-pressed={active} onClick={() => toggleTag(tag)} className={cn(
+                      "px-4 py-2.5 text-sm rounded-xl border-2 font-medium transition-all",
+                      active ? "border-pink-500 bg-pink-500/20 text-pink-300 shadow-lg shadow-pink-500/10" : "border-white/10 bg-white/5 text-slate-400 hover:border-white/20 hover:text-white"
+                    )}>
                       {tag}
                     </button>
-                  );
+                  )
                 })}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 
-        {/* Continue */}
-        <div className="mt-12">
-          <Link
-            to="/continue"
-            className="px-8 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300"
-          >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }} className="mt-12">
+          <Link to="/home" className="px-8 py-3 text-sm font-semibold text-white bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 transition-all">
             Continue
           </Link>
-        </div>
+        </motion.div>
       </div>
     </div>
-  );
-};
-
-export default DesignSkills;
+  )
+}
